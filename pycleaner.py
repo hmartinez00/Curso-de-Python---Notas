@@ -20,6 +20,7 @@ directorio = [
     r'C:\Windows\Prefetch',
     r'C:\Windows\Temp',
     r'C:\Users\admin\AppData\Local\Temp'
+    r'C:\Users\HECTOR~1\AppData\Local\Temp'
 ]
 
 Reportes = []
