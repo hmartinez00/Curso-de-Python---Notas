@@ -16,6 +16,6 @@ def simulacion_montecarlo(num_lanzamientos):
     return probabilidad
 
 # Ejemplo de uso
-num_lanzamientos = 10000
+num_lanzamientos = 100000
 probabilidad = simulacion_montecarlo(num_lanzamientos)
 print(f"La probabilidad estimada de obtener el número 5 en un lanzamiento de dado es: {probabilidad}")
