@@ -1,21 +1,61 @@
+import pandas as pd
+import numpy as np
+import matplotlib as mpl
+import math
+import scipy.stats as stats
 import random
 
-def lanzamiento_dado():
-    return random.randint(1, 6)  # Genera un número aleatorio entre 1 y 6 simulando un lanzamiento de dado
 
-def simulacion_montecarlo(num_lanzamientos):
-    conteo_objetivo = 0  # Contador para el número de veces que se obtiene el número objetivo
-    objetivo = 5  # Número objetivo a obtener
-    
-    for _ in range(num_lanzamientos):
-        resultado = lanzamiento_dado()
-        if resultado == objetivo:
-            conteo_objetivo += 1
-    
-    probabilidad = conteo_objetivo / num_lanzamientos
-    return probabilidad
+## Generamos el Dataframe de Entradas
+activities = {
+    "N": [1, 2, 3, 4, 5, 6, 7, 8],
+    "Actividades": ["Actividad 1", "Actividad 2", "Actividad 3", "Actividad 4", "Actividad 5", "Actividad 6", "Actividad 7", "Actividad n"],
+    "Min": [36, 27, 72, 45, 90, 63, 54, 18],
+    "+Probable": [40, 30, 80, 50, 100, 70, 60, 20],
+    "Max": [50, 37.5, 100, 62.5, 125, 87.5, 75, 25],
+    "Ruta_Critica": [1, 0, 1, 0, 1, 0, 0, 1],
+}
+activities_df = pd.DataFrame(activities)
+activities_df = activities_df[activities_df["Ruta_Critica"] == 1]
 
-# Ejemplo de uso
-num_lanzamientos = 100000
-probabilidad = simulacion_montecarlo(num_lanzamientos)
-print(f"La probabilidad estimada de obtener el número 5 en un lanzamiento de dado es: {probabilidad}")
+## Apliando el DataFrame
+activities_df['Media_(µ)']  = (activities_df['Max'] + 4*activities_df['+Probable'] + activities_df['Min']) / 6
+activities_df['σ']          = (activities_df['Max'] - activities_df['Min']) / 6
+activities_df['σ^2']        = activities_df['σ']**2
+activities_df['α']          = ((activities_df['Media_(µ)'] - activities_df['Min']) / (activities_df['Max'] - activities_df['Min'])) * (((activities_df['Media_(µ)'] - activities_df['Min']) * (activities_df['Max'] - activities_df['Media_(µ)']) / activities_df['σ']**2) - 1)
+activities_df['β']          = ((activities_df['Max'] - activities_df['Media_(µ)']) / (activities_df['Media_(µ)'] - activities_df['Min'])) * activities_df['α']
+
+print(activities_df)
+
+## Calculamos los valores de la Beta-Pert
+    # probabilidades = [random.random() for _ in range(len(activities_df))]
+def gen_dist():
+    probabilidades = [
+        0.69,
+        0.96,
+        0.18,
+        0.01,
+        0.40,
+        0.88,
+        0.45,
+        0.49,
+    ]
+
+    n = len(probabilidades)
+    α = activities_df['α'].values[:n]
+    β = activities_df['β'].values[:n]
+    Min = activities_df['Min'].values[:n]
+    Max = activities_df['Max'].values[:n]
+
+    Beta_Pert = np.empty(n)
+    for i in range(n):
+        Beta_Pert[i] = stats.beta.ppf(probabilidades[i], α[i], β[i], Min[i], Max[i])
+
+    return probabilidades, sum(Beta_Pert)
+
+
+## Generando las simulaciones
+# simulaciones = [gen_dist() for _ in range(400)]
+simulaciones = gen_dist()
+
+print(simulaciones[0], simulaciones[1])
