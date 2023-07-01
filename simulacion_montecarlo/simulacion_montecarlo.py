@@ -12,21 +12,27 @@ subprocess.run('clear', shell=True)
 
 msg_seg = 'Presione un tecla para continuar: '
 
-def report(__var__, __step__, __status__=None):
-    report_steps = [
-        'Mostrando inputs: ',
-        'Valores acumulados de la ruta critica: ',
-        'Mostrando simulaciones: ',
-        'Tiempo de calculo: ',
-        'Generando particion: ',
-        'Distribucion de frecuencias: ',
-    ]
-    if __status__==None:
-        input(f'\n{report_steps[__step__]}\n{__var__}\n{msg_seg}')
+def report(__list_steps__, __status__):
+    if __status__   ==0:
+        for i in __list_steps__:
+            print(f'{__list_steps__[i][0]} Listo!'.replace(': ', ' - '))
+    elif __status__ ==1:
+        for i in __list_steps__:
+            input(f'\n{__list_steps__[i][0]}\n{__list_steps__[i][1]}\n{msg_seg}\n')
 
+num_interaciones = int(input('Paso 1 - Introduzca el numero de simulaciones: '))
 
+# Generando menu de presentacion de informe
+print('\nPaso 2 - Modos de presentacion del informe:\n')
+list_report_type = []
+list_report_type.append('Simple')
+list_report_type.append('Mostrar detalles')
+list_report_type.append('Enviar a Archivo Excel')
+for i in range(len(list_report_type)):
+    print(f'{i}. ', list_report_type[i])
+report_type = int(input('\nIntroduzca el tipo de reporte que desea: '))
 
-num_interaciones = int(input('Introduzca el numero de simulaciones: '))
+time_A = dt.now()
 
 # Generamos el Dataframe de Entradas
 activities = {
@@ -66,9 +72,8 @@ def gen_dist():
     return ans
 
 # Generando las simulaciones
-iteraciones = range(num_interaciones)
-simulaciones, times = [gen_dist()[2] for _ in iteraciones], [dt.now() for _ in iteraciones]
-time = times[-1] - times[0]
+iteraciones  = range(num_interaciones)
+simulaciones = [gen_dist()[2] for _ in iteraciones]
 
 # Generando distribucion de frecuencias
     ## Particionamos el espacio
@@ -86,19 +91,21 @@ def count_occurrences(__list1__, __list2__):
 
 occurrences = count_occurrences(particion, simulaciones)
 
+time_B = dt.now()
+time = time_B - time_A
+seconds = time.total_seconds()
 
-# Generando reportes
-list_steps = []
-list_steps.append(activities_df)
-list_steps.append(scale)
-list_steps.append(simulaciones)
-list_steps.append(time)
-list_steps.append(particion)
-list_steps.append(occurrences)
+# Generando reporte
+print('\nPaso 3: Generando reporte')
+list_steps = {}
+list_steps[0] = ['\t- Inputs: ', activities_df]
+list_steps[1] = ['\t- Valores acumulados de la ruta critica: ', scale]
+list_steps[2] = ['\t- Simulaciones: ', simulaciones]
+list_steps[3] = ['\t- Particion: ', particion]
+list_steps[4] = ['\t- Distribucion de frecuencias: ', occurrences]
+report(list_steps, report_type)
 
-for i in range(len(list_steps)):
-    report(list_steps[i], i)
-
+print(f'\nTiempo de calculo: {seconds}s\n')
 
 # Generamos el grafico
 # plt.style.use('dark_background')
@@ -107,9 +114,10 @@ contraste = 'white'
 letras = '#9598A1'
 file = 'beta_pert_distribution.png'
 msg = 'Plot saved as beta_pert_distribution.png'
-labelX = 'x'
+labelX = 'X'
 labelY = 'Probability Density'
-title = f'Beta-PERT Distribution (Iteraciones = {num_interaciones})'
+title = f'Beta-PERT Distribution'
+subtitle = f'(Iteraciones = {num_interaciones} & Tiempo: {seconds}s)'
 
 fig, ax = plt.subplots()
 x = particion
@@ -129,7 +137,9 @@ ax1.bar(x, y, edgecolor=letras, linewidth=1, width=4, facecolor='none')
 ax1.tick_params(colors=letras)
 
 # Save the plot as a PNG file
+fig.subplots_adjust(top=0.84, bottom=0.15)
 fig.suptitle(title, color=contraste, alpha=0.7)
+plt.title(subtitle, color=contraste, alpha=0.7, fontsize=11)
 fig.savefig(file)
 
 plt.close(fig)
