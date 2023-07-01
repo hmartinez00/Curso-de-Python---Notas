@@ -1,4 +1,3 @@
-from turtle import color
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -7,6 +6,9 @@ import scipy.stats as stats
 import random
 from datetime import datetime as dt
 
+
+msg_seg = 'Presione un tecla para continuar: '
+num_interaciones = int(input('Introduzca el numero de simulaciones: '))
 
 # Generamos el Dataframe de Entradas
 activities = {
@@ -31,8 +33,9 @@ activities_df['β']          = ((activities_df['Max'] - activities_df['Media_(µ
 scale = [round(activities_df.iloc[:, i].sum()) for i in range(len(activities_df.columns)-2) if i > 1]
 scale[5] = round(math.sqrt(scale[6]))
 activities_df = activities_df.reset_index()
-print(activities_df)
-print(scale)
+
+input(f'\nMostrando inputs: \n{activities_df} \n{msg_seg}\n')
+input(f'\nValores acumulados de la ruta critica: {scale} \n{msg_seg}\n')
 
 # Calculamos los valores de la Beta-Pert
 def gen_dist():
@@ -48,11 +51,11 @@ def gen_dist():
     return ans
 
 # Generando las simulaciones
-iteraciones = range(4000)
+iteraciones = range(num_interaciones)
 simulaciones, times = [gen_dist()[2] for _ in iteraciones], [dt.now() for _ in iteraciones]
 time = times[-1] - times[0]
-print(simulaciones)
-print(time)
+input(f'\nMostrando simulaciones: \n{simulaciones} \n{msg_seg}\n')
+input(f'\nTimempo de calculo: \n{time} \n{msg_seg}\n')
 
 # Generando distribucion de frecuencias
     ## Particionamos el espacio
@@ -60,7 +63,7 @@ valor_inicial = scale[0]
 valor_final = scale[2]
 numero_cortes = 20
 particion = np.round(np.linspace(valor_inicial, valor_final, numero_cortes + 1), decimals=0).astype(int)
-print(particion)
+input(f'\nGenerando particion: \n{particion} \n{msg_seg}\n')
 
     ## Construimos la lista de frecuencias
 def count_occurrences(__list1__, __list2__):
@@ -70,20 +73,41 @@ def count_occurrences(__list1__, __list2__):
         count_list.append(count)
     return count_list
 occurrences = count_occurrences(particion, simulaciones)
-print(occurrences)
+input(f'\nDistribucion de frecuencias: \n{occurrences} \n{msg_seg}\n')
+
 
 # Generamos el grafico
+# plt.style.use('dark_background')
+fondo = '#161A25'
+contraste = 'white'
+letras = '#9598A1'
+file = 'beta_pert_distribution.png'
+msg = 'Plot saved as beta_pert_distribution.png'
+labelX = 'x'
+labelY = 'Probability Density'
+title = f'Beta-PERT Distribution (Iteraciones = {num_interaciones})'
+
+fig, ax = plt.subplots()
 x = particion
 y = occurrences
-plt.bar(x, y, edgecolor='blue', linewidth=1, width=4, facecolor='none')
 plt.plot(x, y, color='red')
-plt.xlabel('x')
-plt.ylabel('Probability Density')
-plt.title('Beta-PERT Distribution')
-plt.grid(True)
+fig.set_facecolor(fondo)
+ax.set_facecolor(fondo)
+ax.set_xlabel(labelX)
+ax.set_ylabel(labelY)
+ax.grid(linestyle='--', alpha=0.3)
+ax.tick_params(colors=letras)
+ax.yaxis.label.set_color(letras)
+ax.xaxis.label.set_color(letras)
+
+ax1 = ax.twiny()
+ax1.bar(x, y, edgecolor=letras, linewidth=1, width=4, facecolor='none')
+ax1.tick_params(colors=letras)
 
 # Save the plot as a PNG file
-plt.savefig('beta_pert_distribution.png')
+fig.suptitle(title, color=contraste, alpha=0.7)
+fig.savefig(file)
 
+plt.close(fig)
 # Display a message once the file is saved
-print("Plot saved as beta_pert_distribution.png")
+print(msg)
