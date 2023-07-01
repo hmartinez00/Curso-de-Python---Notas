@@ -4,9 +4,10 @@ import matplotlib as mpl
 import math
 import scipy.stats as stats
 import random
+from datetime import datetime as dt
 
 
-## Generamos el Dataframe de Entradas
+# Generamos el Dataframe de Entradas
 activities = {
     "N": [1, 2, 3, 4, 5, 6, 7, 8],
     "Actividades": ["Actividad 1", "Actividad 2", "Actividad 3", "Actividad 4", "Actividad 5", "Actividad 6", "Actividad 7", "Actividad n"],
@@ -18,42 +19,45 @@ activities = {
 activities_df = pd.DataFrame(activities)
 activities_df = activities_df[activities_df["Ruta_Critica"] == 1]
 
-## Apliando el DataFrame
+    ## Ampliamos el DataFrame
 activities_df['Media_(µ)']  = (activities_df['Max'] + 4*activities_df['+Probable'] + activities_df['Min']) / 6
 activities_df['σ']          = (activities_df['Max'] - activities_df['Min']) / 6
-activities_df['σ^2']        = activities_df['σ']**2
+activities_df['σ^2']        =  activities_df['σ']**2
 activities_df['α']          = ((activities_df['Media_(µ)'] - activities_df['Min']) / (activities_df['Max'] - activities_df['Min'])) * (((activities_df['Media_(µ)'] - activities_df['Min']) * (activities_df['Max'] - activities_df['Media_(µ)']) / activities_df['σ']**2) - 1)
 activities_df['β']          = ((activities_df['Max'] - activities_df['Media_(µ)']) / (activities_df['Media_(µ)'] - activities_df['Min'])) * activities_df['α']
 
+    ## Determinamos las sumas del DataFrame extendido
+scale = [round(activities_df.iloc[:, i].sum()) for i in range(len(activities_df.columns)-2) if i > 1]
+scale[5] = round(math.sqrt(scale[6]))
+activities_df = activities_df.reset_index()
 print(activities_df)
+print(scale)
 
-## Calculamos los valores de la Beta-Pert
+# Calculamos los valores de la Beta-Pert
 def gen_dist():
-    probabilidades = [random.random() for _ in range(len(activities_df))]
-    # probabilidades = [
-    #     0.69,
-    #     0.96,
-    #     0.18,
-    #     0.01,
-    #     0.40,
-    #     0.88,
-    #     0.45,
-    #     0.49,
-    # ]
-
+    probabilidades = [round(random.random(), 2) for _ in range(len(activities_df))]
     Beta_Pert = stats.beta.ppf(
         probabilidades,
         activities_df['α'],
         activities_df['β'],
         activities_df['Min'],
-        activities_df['Max'],
+        (activities_df['Max'] - activities_df['Min']),
     )
+    ans = [probabilidades, Beta_Pert, round(sum(Beta_Pert))]
+    return ans
 
-    return probabilidades, sum(Beta_Pert)
+# Generando las simulaciones
+iteraciones = range(4000)
+simulaciones, times = [gen_dist()[2] for _ in iteraciones], [dt.now() for _ in iteraciones]
+time = times[-1] - times[0]
+print(simulaciones)
+print(time)
 
+# Generando distribucion de frecuencias
+valor_inicial = scale[0]
+valor_final = scale[2]
+numero_cortes = 20
 
-## Generando las simulaciones
-# simulaciones = [gen_dist() for _ in range(400)]
-simulaciones = gen_dist()
+particion = np.round(np.linspace(valor_inicial, valor_final, numero_cortes + 1), decimals=0)
 
-print(simulaciones[0], simulaciones[1])
+print(particion[0])
