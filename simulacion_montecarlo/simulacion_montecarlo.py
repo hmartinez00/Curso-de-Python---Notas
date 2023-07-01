@@ -34,12 +34,15 @@ for i in options:
     print(f'{i}. ', list_report_type[i])
 
 while True:
-    report_type = int(input('\nIntroduzca el tipo de reporte que desea: '))
-    if report_type in options:
-        break
+    report_type = input('\nIntroduzca el tipo de reporte que desea: ')
+    if report_type.isdigit():
+        if int(report_type) in options:
+            report_type = int(report_type)
+            break
+        else:
+            print('Opcion Invalida!')
     else:
-        print('Opcion Invalida!')
-
+        print('Ingrese un número válido.')
 
 time_A = dt.now()
 
