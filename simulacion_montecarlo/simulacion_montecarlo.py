@@ -1,6 +1,7 @@
+from turtle import color
 import pandas as pd
 import numpy as np
-import matplotlib as mpl
+import matplotlib.pyplot as plt
 import math
 import scipy.stats as stats
 import random
@@ -54,10 +55,35 @@ print(simulaciones)
 print(time)
 
 # Generando distribucion de frecuencias
+    ## Particionamos el espacio
 valor_inicial = scale[0]
 valor_final = scale[2]
 numero_cortes = 20
+particion = np.round(np.linspace(valor_inicial, valor_final, numero_cortes + 1), decimals=0).astype(int)
+print(particion)
 
-particion = np.round(np.linspace(valor_inicial, valor_final, numero_cortes + 1), decimals=0)
+    ## Construimos la lista de frecuencias
+def count_occurrences(__list1__, __list2__):
+    count_list = []
+    for element in __list1__:
+        count = __list2__.count(element)
+        count_list.append(count)
+    return count_list
+occurrences = count_occurrences(particion, simulaciones)
+print(occurrences)
 
-print(particion[0])
+# Generamos el grafico
+x = particion
+y = occurrences
+plt.bar(x, y, edgecolor='blue', linewidth=1, width=4, facecolor='none')
+plt.plot(x, y, color='red')
+plt.xlabel('x')
+plt.ylabel('Probability Density')
+plt.title('Beta-PERT Distribution')
+plt.grid(True)
+
+# Save the plot as a PNG file
+plt.savefig('beta_pert_distribution.png')
+
+# Display a message once the file is saved
+print("Plot saved as beta_pert_distribution.png")
