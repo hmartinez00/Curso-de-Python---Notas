@@ -112,8 +112,8 @@ print(f'\nTiempo de calculo: {seconds}s\n')
 fondo = '#161A25'
 contraste = 'white'
 letras = '#9598A1'
-file = 'beta_pert_distribution.png'
-msg = 'Plot saved as beta_pert_distribution.png'
+file = 'beta_pert_distribution.svg'
+msg = 'Plot saved as beta_pert_distribution.svg'
 labelX = 'X'
 labelY = 'Probability Density'
 title = f'Beta-PERT Distribution'
@@ -140,7 +140,7 @@ ax1.tick_params(colors=letras)
 fig.subplots_adjust(top=0.84, bottom=0.15)
 fig.suptitle(title, color=contraste, alpha=0.7)
 plt.title(subtitle, color=contraste, alpha=0.7, fontsize=11)
-fig.savefig(file)
+fig.savefig(file, format="svg", dpi=300)
 
 plt.close(fig)
 # Display a message once the file is saved
