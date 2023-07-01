@@ -28,28 +28,26 @@ activities_df['β']          = ((activities_df['Max'] - activities_df['Media_(µ
 print(activities_df)
 
 ## Calculamos los valores de la Beta-Pert
-    # probabilidades = [random.random() for _ in range(len(activities_df))]
 def gen_dist():
-    probabilidades = [
-        0.69,
-        0.96,
-        0.18,
-        0.01,
-        0.40,
-        0.88,
-        0.45,
-        0.49,
-    ]
+    probabilidades = [random.random() for _ in range(len(activities_df))]
+    # probabilidades = [
+    #     0.69,
+    #     0.96,
+    #     0.18,
+    #     0.01,
+    #     0.40,
+    #     0.88,
+    #     0.45,
+    #     0.49,
+    # ]
 
-    n = len(probabilidades)
-    α = activities_df['α'].values[:n]
-    β = activities_df['β'].values[:n]
-    Min = activities_df['Min'].values[:n]
-    Max = activities_df['Max'].values[:n]
-
-    Beta_Pert = np.empty(n)
-    for i in range(n):
-        Beta_Pert[i] = stats.beta.ppf(probabilidades[i], α[i], β[i], Min[i], Max[i])
+    Beta_Pert = stats.beta.ppf(
+        probabilidades,
+        activities_df['α'],
+        activities_df['β'],
+        activities_df['Min'],
+        activities_df['Max'],
+    )
 
     return probabilidades, sum(Beta_Pert)
 
