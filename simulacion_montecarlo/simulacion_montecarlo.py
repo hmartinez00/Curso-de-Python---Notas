@@ -28,9 +28,18 @@ list_report_type = []
 list_report_type.append('Simple')
 list_report_type.append('Mostrar detalles')
 list_report_type.append('Enviar a Archivo Excel')
-for i in range(len(list_report_type)):
+options = range(len(list_report_type))
+
+for i in options:
     print(f'{i}. ', list_report_type[i])
-report_type = int(input('\nIntroduzca el tipo de reporte que desea: '))
+
+while True:
+    report_type = int(input('\nIntroduzca el tipo de reporte que desea: '))
+    if report_type in options:
+        break
+    else:
+        print('Opcion Invalida!')
+
 
 time_A = dt.now()
 
