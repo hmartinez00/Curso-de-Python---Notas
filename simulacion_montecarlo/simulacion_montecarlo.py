@@ -1,13 +1,31 @@
+import math
+import random
+from datetime import datetime as dt
+import subprocess
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import math
 import scipy.stats as stats
-import random
-from datetime import datetime as dt
 
+
+subprocess.run('clear', shell=True)
 
 msg_seg = 'Presione un tecla para continuar: '
+
+def report(__var__, __step__, __status__=None):
+    report_steps = [
+        'Mostrando inputs: ',
+        'Valores acumulados de la ruta critica: ',
+        'Mostrando simulaciones: ',
+        'Tiempo de calculo: ',
+        'Generando particion: ',
+        'Distribucion de frecuencias: ',
+    ]
+    if __status__==None:
+        input(f'\n{report_steps[__step__]}\n{__var__}\n{msg_seg}')
+
+
+
 num_interaciones = int(input('Introduzca el numero de simulaciones: '))
 
 # Generamos el Dataframe de Entradas
@@ -34,9 +52,6 @@ scale = [round(activities_df.iloc[:, i].sum()) for i in range(len(activities_df.
 scale[5] = round(math.sqrt(scale[6]))
 activities_df = activities_df.reset_index()
 
-input(f'\nMostrando inputs: \n{activities_df} \n{msg_seg}\n')
-input(f'\nValores acumulados de la ruta critica: {scale} \n{msg_seg}\n')
-
 # Calculamos los valores de la Beta-Pert
 def gen_dist():
     probabilidades = [round(random.random(), 2) for _ in range(len(activities_df))]
@@ -54,8 +69,6 @@ def gen_dist():
 iteraciones = range(num_interaciones)
 simulaciones, times = [gen_dist()[2] for _ in iteraciones], [dt.now() for _ in iteraciones]
 time = times[-1] - times[0]
-input(f'\nMostrando simulaciones: \n{simulaciones} \n{msg_seg}\n')
-input(f'\nTimempo de calculo: \n{time} \n{msg_seg}\n')
 
 # Generando distribucion de frecuencias
     ## Particionamos el espacio
@@ -63,8 +76,6 @@ valor_inicial = scale[0]
 valor_final = scale[2]
 numero_cortes = 20
 particion = np.round(np.linspace(valor_inicial, valor_final, numero_cortes + 1), decimals=0).astype(int)
-input(f'\nGenerando particion: \n{particion} \n{msg_seg}\n')
-
     ## Construimos la lista de frecuencias
 def count_occurrences(__list1__, __list2__):
     count_list = []
@@ -72,8 +83,21 @@ def count_occurrences(__list1__, __list2__):
         count = __list2__.count(element)
         count_list.append(count)
     return count_list
+
 occurrences = count_occurrences(particion, simulaciones)
-input(f'\nDistribucion de frecuencias: \n{occurrences} \n{msg_seg}\n')
+
+
+# Generando reportes
+list_steps = []
+list_steps.append(activities_df)
+list_steps.append(scale)
+list_steps.append(simulaciones)
+list_steps.append(time)
+list_steps.append(particion)
+list_steps.append(occurrences)
+
+for i in range(len(list_steps)):
+    report(list_steps[i], i)
 
 
 # Generamos el grafico
