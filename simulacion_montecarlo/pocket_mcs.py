@@ -27,7 +27,7 @@ def report(__list_steps__, __status__):
             print(file_dir)
 
 while True:
-    num_interaciones = input('Paso 1 - Introduzca el numero de simulaciones: ')
+    num_interaciones = input('Introduzca el numero de simulaciones: ')
     if num_interaciones.isdigit():
         num_interaciones = int(num_interaciones)
         break
@@ -41,7 +41,7 @@ report_type = 2
 time_A = dt.now()
 
 # Generamos el Dataframe de Entradas
-archivo_excel = 'calculo_riesgos_1.xlsm'
+archivo_excel = 'calculo_riesgos.xlsm'
 nombre_hoja = '0'
 
     ## Lee los datos de la hoja de cálculo en un dataframe
