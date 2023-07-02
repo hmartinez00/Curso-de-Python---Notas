@@ -13,18 +13,13 @@ subprocess.run('clear', shell=True)
 
 msg_seg = 'Presione un tecla para continuar: '
 
-def report(__list_steps__, __status__):
+def report(__list_steps__):
     for i in __list_steps__:
-        if __status__   ==0:
-            print(f'{__list_steps__[i][0]} Listo!'.replace(': ', ' - '))
-        elif __status__ ==1:
-            input(f'\n{__list_steps__[i][0]}\n{__list_steps__[i][1]}\n{msg_seg}\n')
-        elif __status__ ==2:
-            file_name = str(__list_steps__[i][0]).replace(': ', '')
-            file_name = file_name.replace('\t- ', '') + '.csv'
-            file_dir = os.path.join('src', file_name)
-            __list_steps__[i][1].to_csv(file_dir, index=False)
-            print(file_dir)
+        file_name = str(__list_steps__[i][0]).replace(': ', '')
+        file_name = file_name.replace('\t- ', '') + '.csv'
+        file_dir = os.path.join('src', file_name)
+        __list_steps__[i][1].to_csv(file_dir, index=False)
+        print(file_dir)
 
 while True:
     num_interaciones = input('Introduzca el numero de simulaciones: ')
@@ -34,9 +29,6 @@ while True:
     else:
         print('Ingrese un número válido.')    
 
-
-# Generando menu de presentacion de informe
-report_type = 2
 
 time_A = dt.now()
 
@@ -49,11 +41,11 @@ activities_df = pd.read_excel(archivo_excel, sheet_name=nombre_hoja)
 activities_df = activities_df[activities_df["Ruta_Critica"] == 1]
 
     ## Ampliamos el DataFrame
-activities_df['Media_(µ)']  = (activities_df['Max'] + 4*activities_df['+Probable'] + activities_df['Min']) / 6
-activities_df['σ']          = (activities_df['Max'] - activities_df['Min']) / 6
-activities_df['σ^2']        =  activities_df['σ']**2
-activities_df['α']          = ((activities_df['Media_(µ)'] - activities_df['Min']) / (activities_df['Max'] - activities_df['Min'])) * (((activities_df['Media_(µ)'] - activities_df['Min']) * (activities_df['Max'] - activities_df['Media_(µ)']) / activities_df['σ']**2) - 1)
-activities_df['β']          = ((activities_df['Max'] - activities_df['Media_(µ)']) / (activities_df['Media_(µ)'] - activities_df['Min'])) * activities_df['α']
+activities_df['Media_(mu)']  = (activities_df['Max'] + 4*activities_df['Probable'] + activities_df['Min']) / 6
+activities_df['sigma']       = (activities_df['Max'] - activities_df['Min']) / 6
+activities_df['sigma^2']     =  activities_df['sigma']**2
+activities_df['alpha']       = ((activities_df['Media_(mu)'] - activities_df['Min']) / (activities_df['Max'] - activities_df['Min'])) * (((activities_df['Media_(mu)'] - activities_df['Min']) * (activities_df['Max'] - activities_df['Media_(mu)']) / activities_df['sigma']**2) - 1)
+activities_df['beta']        = ((activities_df['Max'] - activities_df['Media_(mu)']) / (activities_df['Media_(mu)'] - activities_df['Min'])) * activities_df['alpha']
 
     ## Determinamos las sumas del DataFrame extendido
 scale = [round(activities_df.iloc[:, i].sum()) for i in range(len(activities_df.columns)-2) if i > 1]
@@ -70,8 +62,8 @@ def gen_dist():
     probabilidades = [round(random.random(), 2) for _ in range(len(activities_df))]
     Beta_Pert = stats.beta.ppf(
         probabilidades,
-        activities_df['α'],
-        activities_df['β'],
+        activities_df['alpha'],
+        activities_df['beta'],
         activities_df['Min'],
         (activities_df['Max'] - activities_df['Min']),
     )
@@ -126,7 +118,7 @@ list_steps[0] = ['\t- Inputs: ', activities_df]
 list_steps[1] = ['\t- Acumulados: ', scale_df]
 list_steps[2] = ['\t- Simulaciones: ', simulaciones_df]
 list_steps[3] = ['\t- Frecuencias: ', distribucion_df]
-report(list_steps, report_type)
+report(list_steps)
 
 print(f'\nTiempo de calculo: {seconds}s\n')
 
