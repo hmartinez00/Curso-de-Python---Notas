@@ -39,6 +39,7 @@ nombre_hoja = '0'
     ## Lee los datos de la hoja de cálculo en un dataframe
 activities_df = pd.read_excel(archivo_excel, sheet_name=nombre_hoja)
 activities_df = activities_df[activities_df["Ruta_Critica"] == 1]
+print(activities_df)
 
     ## Ampliamos el DataFrame
 activities_df['Media_(mu)']  = (activities_df['Max'] + 4*activities_df['Probable'] + activities_df['Min']) / 6
@@ -106,7 +107,6 @@ distribucion_df = {
 distribucion_df = pd.DataFrame(distribucion_df)
 
 
-
 time_B = dt.now()
 time = time_B - time_A
 seconds = time.total_seconds()
@@ -123,7 +123,6 @@ report(list_steps)
 print(f'\nTiempo de calculo: {seconds}s\n')
 
 # Generamos el grafico
-# plt.style.use('dark_background')
 fondo = '#161A25'
 contraste = 'white'
 letras = '#9598A1'
