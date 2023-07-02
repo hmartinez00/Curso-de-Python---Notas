@@ -1,3 +1,4 @@
+import os
 import math
 import random
 from datetime import datetime as dt
@@ -13,12 +14,17 @@ subprocess.run('clear', shell=True)
 msg_seg = 'Presione un tecla para continuar: '
 
 def report(__list_steps__, __status__):
-    if __status__   ==0:
-        for i in __list_steps__:
+    for i in __list_steps__:
+        if __status__   ==0:
             print(f'{__list_steps__[i][0]} Listo!'.replace(': ', ' - '))
-    elif __status__ ==1:
-        for i in __list_steps__:
+        elif __status__ ==1:
             input(f'\n{__list_steps__[i][0]}\n{__list_steps__[i][1]}\n{msg_seg}\n')
+        elif __status__ ==2:
+            file_name = str(__list_steps__[i][0]).replace(': ', '')
+            file_name = file_name.replace('\t- ', '') + '.csv'
+            file_dir = os.path.join('src', file_name)
+            __list_steps__[i][1].to_csv(file_dir, index=False)
+            print(file_dir)
 
 while True:
     num_interaciones = input('Paso 1 - Introduzca el numero de simulaciones: ')
@@ -148,7 +154,7 @@ print(f'\nTiempo de calculo: {seconds}s\n')
 fondo = '#161A25'
 contraste = 'white'
 letras = '#9598A1'
-file = 'beta_pert_distribution.svg'
+file = os.path.join('src', 'beta_pert_distribution.svg')
 msg = 'Plot saved as beta_pert_distribution.svg'
 labelX = 'X'
 labelY = 'Probability Density'
