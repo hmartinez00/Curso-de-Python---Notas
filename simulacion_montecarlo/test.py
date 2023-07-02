@@ -71,93 +71,11 @@ def gen_dist():
     ans = probabilidades + list(Beta_Pert) + [round(sum(Beta_Pert))]
     return ans
 
-
-# ----------------------------------------------------
     ## Generando las simulaciones
 iteraciones  = range(num_interaciones)
-simulaciones_df = [gen_dist() for _ in iteraciones]
+simulaciones_ext = [gen_dist() for _ in iteraciones]
 
-    ## * Generando el DataFrame de reporte
-simulaciones_df = pd.DataFrame(simulaciones_df)
-simulaciones = list(simulaciones_df.iloc[:,-1])
-# ----------------------------------------------------
-
-
-# Generando distribucion de frecuencias
-    ## Particionamos el espacio
-valor_inicial = scale[0]
-valor_final = scale[2]
-numero_cortes = 20
-particion = np.round(np.linspace(valor_inicial, valor_final, numero_cortes + 1), decimals=0).astype(int)
-    ## Construimos la lista de frecuencias
-def count_occurrences(__list1__, __list2__):
-    count_list = []
-    for element in __list1__:
-        count = __list2__.count(element)
-        count_list.append(count)
-    return count_list
-
-occurrences = count_occurrences(particion, simulaciones)
-
-    ## * Generando el DataFrame de reporte
-distribucion_df = {
-    'values'    : particion,
-    'count'     : occurrences,
-}
-distribucion_df = pd.DataFrame(distribucion_df)
-
-
-time_B = dt.now()
-time = time_B - time_A
-seconds = time.total_seconds()
-
-# Generando reporte
-print('\nPaso 3: Generando reporte')
-list_steps = {}
-list_steps[0] = ['\t- Inputs: ', activities_df]
-list_steps[1] = ['\t- Acumulados: ', scale_df]
-list_steps[2] = ['\t- Simulaciones: ', simulaciones_df]
-list_steps[3] = ['\t- Frecuencias: ', distribucion_df]
-report(list_steps)
-
-print(f'\nTiempo de calculo: {seconds}s\n')
-
-# Generamos el grafico
-fondo = '#161A25'
-contraste = 'white'
-letras = '#9598A1'
-file1 = os.path.join('src', 'beta_pert_distribution.svg')
-file2 = os.path.join('src', 'beta_pert_distribution.png')
-msg = 'Plot saved as beta_pert_distribution.svg'
-labelX = 'X'
-labelY = 'Probability Density'
-title = f'Beta-PERT Distribution'
-subtitle = f'(Iteraciones = {num_interaciones} & Tiempo: {seconds}s)'
-
-fig, ax = plt.subplots()
-x = particion
-y = occurrences
-plt.plot(x, y, color='red')
-fig.set_facecolor(fondo)
-ax.set_facecolor(fondo)
-ax.set_xlabel(labelX)
-ax.set_ylabel(labelY)
-ax.grid(linestyle='--', alpha=0.3)
-ax.tick_params(colors=letras)
-ax.yaxis.label.set_color(letras)
-ax.xaxis.label.set_color(letras)
-
-ax1 = ax.twiny()
-ax1.bar(x, y, edgecolor=letras, linewidth=1, width=4, facecolor='none')
-ax1.tick_params(colors=letras)
-
-# Save the plot as a file
-fig.subplots_adjust(top=0.84, bottom=0.15)
-fig.suptitle(title, color=contraste, alpha=0.7)
-plt.title(subtitle, color=contraste, alpha=0.7, fontsize=11)
-fig.savefig(file1, format="svg", dpi=300)
-fig.savefig(file2)
-
-plt.close(fig)
-# Display a message once the file is saved
-print(msg)
+simulaciones_ext = pd.DataFrame(simulaciones_ext)
+simulaciones = list(simulaciones_ext.iloc[:,-1])
+print(simulaciones_ext)
+print(simulaciones)
