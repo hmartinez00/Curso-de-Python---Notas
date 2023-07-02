@@ -57,7 +57,7 @@ time_A = dt.now()
 archivo_excel = 'test.xlsx'
 nombre_hoja = 'Inputs'
 
-# Lee los datos de la hoja de cálculo en un dataframe
+    ## Lee los datos de la hoja de cálculo en un dataframe
 activities_df = pd.read_excel(archivo_excel, sheet_name=nombre_hoja)
 activities_df = activities_df[activities_df["Ruta_Critica"] == 1]
 
