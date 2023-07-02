@@ -71,11 +71,14 @@ activities_df['β']          = ((activities_df['Max'] - activities_df['Media_(µ
     ## Determinamos las sumas del DataFrame extendido
 scale = [round(activities_df.iloc[:, i].sum()) for i in range(len(activities_df.columns)-2) if i > 1]
 scale[5] = round(math.sqrt(scale[6]))
+
+    ## * Generando el DataFrame de reporte
+activities_df = activities_df.reset_index()
 scale_df = pd.DataFrame([scale], columns=list(activities_df.columns)[3:10])
 
-activities_df = activities_df.reset_index()
 
 # Calculamos los valores de la Beta-Pert
+    ## Definiendo el evento aleatorio
 def gen_dist():
     probabilidades = [round(random.random(), 2) for _ in range(len(activities_df))]
     Beta_Pert = stats.beta.ppf(
@@ -88,9 +91,17 @@ def gen_dist():
     ans = [probabilidades, Beta_Pert, round(sum(Beta_Pert))]
     return ans
 
-# Generando las simulaciones
+    ## Generando las simulaciones
 iteraciones  = range(num_interaciones)
 simulaciones = [gen_dist()[2] for _ in iteraciones]
+
+    ## * Generando el DataFrame de reporte
+simulaciones_df = {
+    'N'     : iteraciones,
+    'values': simulaciones,
+}
+simulaciones_df = pd.DataFrame(simulaciones_df)
+
 
 # Generando distribucion de frecuencias
     ## Particionamos el espacio
@@ -108,6 +119,15 @@ def count_occurrences(__list1__, __list2__):
 
 occurrences = count_occurrences(particion, simulaciones)
 
+    ## * Generando el DataFrame de reporte
+distribucion_df = {
+    'values'    : particion,
+    'count'     : occurrences,
+}
+distribucion_df = pd.DataFrame(distribucion_df)
+
+
+
 time_B = dt.now()
 time = time_B - time_A
 seconds = time.total_seconds()
@@ -116,10 +136,9 @@ seconds = time.total_seconds()
 print('\nPaso 3: Generando reporte')
 list_steps = {}
 list_steps[0] = ['\t- Inputs: ', activities_df]
-list_steps[1] = ['\t- Valores acumulados de la ruta critica: ', scale_df]
-list_steps[2] = ['\t- Simulaciones: ', simulaciones]
-list_steps[3] = ['\t- Particion: ', particion]
-list_steps[4] = ['\t- Distribucion de frecuencias: ', occurrences]
+list_steps[1] = ['\t- Acumulados: ', scale_df]
+list_steps[2] = ['\t- Simulaciones: ', simulaciones_df]
+list_steps[3] = ['\t- Frecuencias: ', distribucion_df]
 report(list_steps, report_type)
 
 print(f'\nTiempo de calculo: {seconds}s\n')
