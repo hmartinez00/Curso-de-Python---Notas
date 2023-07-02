@@ -20,7 +20,14 @@ def report(__list_steps__, __status__):
         for i in __list_steps__:
             input(f'\n{__list_steps__[i][0]}\n{__list_steps__[i][1]}\n{msg_seg}\n')
 
-num_interaciones = int(input('Paso 1 - Introduzca el numero de simulaciones: '))
+while True:
+    num_interaciones = input('Paso 1 - Introduzca el numero de simulaciones: ')
+    if num_interaciones.isdigit():
+        num_interaciones = int(num_interaciones)
+        break
+    else:
+        print('Ingrese un número válido.')    
+
 
 # Generando menu de presentacion de informe
 print('\nPaso 2 - Modos de presentacion del informe:\n')
@@ -47,15 +54,11 @@ while True:
 time_A = dt.now()
 
 # Generamos el Dataframe de Entradas
-activities = {
-    "N": [1, 2, 3, 4, 5, 6, 7, 8],
-    "Actividades": ["Actividad 1", "Actividad 2", "Actividad 3", "Actividad 4", "Actividad 5", "Actividad 6", "Actividad 7", "Actividad n"],
-    "Min": [36, 27, 72, 45, 90, 63, 54, 18],
-    "+Probable": [40, 30, 80, 50, 100, 70, 60, 20],
-    "Max": [50, 37.5, 100, 62.5, 125, 87.5, 75, 25],
-    "Ruta_Critica": [1, 0, 1, 0, 1, 0, 0, 1],
-}
-activities_df = pd.DataFrame(activities)
+archivo_excel = 'test.xlsx'
+nombre_hoja = 'Inputs'
+
+# Lee los datos de la hoja de cálculo en un dataframe
+activities_df = pd.read_excel(archivo_excel, sheet_name=nombre_hoja)
 activities_df = activities_df[activities_df["Ruta_Critica"] == 1]
 
     ## Ampliamos el DataFrame
@@ -68,6 +71,8 @@ activities_df['β']          = ((activities_df['Max'] - activities_df['Media_(µ
     ## Determinamos las sumas del DataFrame extendido
 scale = [round(activities_df.iloc[:, i].sum()) for i in range(len(activities_df.columns)-2) if i > 1]
 scale[5] = round(math.sqrt(scale[6]))
+scale_df = pd.DataFrame([scale], columns=list(activities_df.columns)[3:10])
+
 activities_df = activities_df.reset_index()
 
 # Calculamos los valores de la Beta-Pert
@@ -111,7 +116,7 @@ seconds = time.total_seconds()
 print('\nPaso 3: Generando reporte')
 list_steps = {}
 list_steps[0] = ['\t- Inputs: ', activities_df]
-list_steps[1] = ['\t- Valores acumulados de la ruta critica: ', scale]
+list_steps[1] = ['\t- Valores acumulados de la ruta critica: ', scale_df]
 list_steps[2] = ['\t- Simulaciones: ', simulaciones]
 list_steps[3] = ['\t- Particion: ', particion]
 list_steps[4] = ['\t- Distribucion de frecuencias: ', occurrences]
