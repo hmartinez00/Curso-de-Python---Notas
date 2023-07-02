@@ -60,8 +60,8 @@ while True:
 time_A = dt.now()
 
 # Generamos el Dataframe de Entradas
-archivo_excel = 'test.xlsx'
-nombre_hoja = 'Inputs'
+archivo_excel = 'calculo_riesgos_1.xlsm'
+nombre_hoja = '0'
 
     ## Lee los datos de la hoja de cálculo en un dataframe
 activities_df = pd.read_excel(archivo_excel, sheet_name=nombre_hoja)
